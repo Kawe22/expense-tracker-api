@@ -1,34 +1,38 @@
-package br.ufpb.dsc.expense_tracker_api.entity;
+package br.ufpb.dsc.expense_tracker_api.model;
 
+import javax.persistence.*;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.NotBlank;
 import java.util.List;
 
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-
 @Entity
-@Table(name="person")
+@Table(name = "person")
 public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotBlank(message = "O primeiro nome não pode estar em branco")
     private String firstName;
+
+    @NotBlank(message = "O sobrenome não pode estar em branco")
     private String lastName;
+
+    @Email(message = "O email deve ser válido")
+    @NotBlank(message = "O email não pode estar em branco")
     private String email;
+
+    @NotBlank(message = "A senha não pode estar em branco")
     private String password;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Category> categories;  // Ajustado para o novo pacote
+    private List<Category> categories;
 
     @OneToMany(mappedBy = "user", cascade = CascadeType.REMOVE)
-    private List<Transaction> transactions;  // Ajustado para o novo pacote
+    private List<Transaction> transactions;
 
+    // Construtores
     public User() {
     }
 
@@ -52,6 +56,7 @@ public class User {
         this.password = password;
     }
 
+    // Getters e Setters
     public Integer getId() {
         return id;
     }

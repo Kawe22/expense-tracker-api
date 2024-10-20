@@ -7,8 +7,8 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import br.ufpb.dsc.expense_tracker_api.dao.UserRepository;
-import br.ufpb.dsc.expense_tracker_api.entity.User;
+import br.ufpb.dsc.expense_tracker_api.repository.UserRepository;
+import br.ufpb.dsc.expense_tracker_api.model.User;
 import br.ufpb.dsc.expense_tracker_api.exception.EtAuthException;
 import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
 
@@ -72,7 +72,6 @@ public class UserServiceImpl implements UserService {
         user.setFirstName(userDetails.getFirstName());
         user.setLastName(userDetails.getLastName());
         user.setEmail(userDetails.getEmail());
-        // Atualize mais campos conforme necessário
 
         return userRepository.save(user);
     }

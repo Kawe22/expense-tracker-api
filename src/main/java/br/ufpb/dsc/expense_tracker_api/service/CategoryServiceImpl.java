@@ -3,8 +3,8 @@ package br.ufpb.dsc.expense_tracker_api.service;
 import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import br.ufpb.dsc.expense_tracker_api.dao.CategoryRepository;
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
+import br.ufpb.dsc.expense_tracker_api.repository.CategoryRepository;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
 import br.ufpb.dsc.expense_tracker_api.exception.EtBadRequestException;
 import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
 
@@ -31,7 +31,6 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category saveCategory(Category category) throws EtBadRequestException {
         try {
-            // Verifica se a categoria já existe antes de salvar
             if (category.getId() != null) {
                 Category existingCategory = categoryRepository.findByIdAndUserId(category.getId(), category.getUser().getId());
                 if (existingCategory == null) {
@@ -39,7 +38,6 @@ public class CategoryServiceImpl implements CategoryService {
                 }
             }
 
-            // Salva ou atualiza a categoria
             return categoryRepository.save(category);
         } catch (Exception e) {
             throw new EtBadRequestException("Invalid request", e);

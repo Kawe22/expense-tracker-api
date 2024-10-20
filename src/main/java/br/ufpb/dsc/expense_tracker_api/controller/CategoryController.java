@@ -1,32 +1,24 @@
 package br.ufpb.dsc.expense_tracker_api.controller;
 
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
+import br.ufpb.dsc.expense_tracker_api.dto.CategoryRequestDTO;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
+import br.ufpb.dsc.expense_tracker_api.model.User;
+import br.ufpb.dsc.expense_tracker_api.service.CategoryService;
+import br.ufpb.dsc.expense_tracker_api.service.UserService;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
-import br.ufpb.dsc.expense_tracker_api.entity.Transaction;
-import br.ufpb.dsc.expense_tracker_api.entity.User;
-import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
-import br.ufpb.dsc.expense_tracker_api.service.CategoryService;
-import br.ufpb.dsc.expense_tracker_api.service.UserService;
-
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
-@Api(tags = "2. Categorias") // Definindo a seção no Swagger
+@Api(tags = "2. Categorias")
 public class CategoryController {
 
     @Autowired
@@ -46,11 +38,8 @@ public class CategoryController {
     @GetMapping("/categories/{categoryId}")
     public ResponseEntity<?> getCategoryById(HttpServletRequest request, @PathVariable("categoryId") Integer categoryId) {
         int userId = (Integer) request.getAttribute("userId");
-
-        // Buscar a categoria
         Category category = categoryService.fetchCategoryById(categoryId, userId);
 
-        // Verificar se a categoria pertence ao usuário autenticado
         if (category == null || !category.getUser().getId().equals(userId)) {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para acessar esta categoria.");
         }
@@ -60,23 +49,30 @@ public class CategoryController {
 
     @ApiOperation(value = "Cria uma nova categoria.")
     @PostMapping("/categories")
-    public Category addCategory(HttpServletRequest request, @RequestBody Category category) {
+    public ResponseEntity<?> addCategory(HttpServletRequest request, @Valid @RequestBody CategoryRequestDTO categoryRequestDTO) {
         int userId = (Integer) request.getAttribute("userId");
         User user = userService.getUserById(userId);
-        category.setUser(user);
-        return categoryService.saveCategory(category);
+        if (user == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuário não encontrado.");
+        }
+
+        Category category = new Category();
+        category.setTitle(categoryRequestDTO.getTitle());
+        category.setDescription(categoryRequestDTO.getDescription());
+        category.setUser(user); // Define o usuário da categoria com base no token JWT
+
+        Category savedCategory = categoryService.saveCategory(category);
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedCategory);
     }
 
     @ApiOperation(value = "Atualiza os dados de uma categoria específica.")
     @PutMapping("/categories/{categoryId}")
     public ResponseEntity<?> updateCategory(HttpServletRequest request,
                                             @PathVariable("categoryId") Integer categoryId,
-                                            @RequestBody Category categoryUpdate) {
+                                            @Valid @RequestBody CategoryRequestDTO categoryUpdateDTO) {
         int userId = (Integer) request.getAttribute("userId");
 
-        // Recuperar a categoria existente do banco de dados
         Category existingCategory = categoryService.fetchCategoryById(categoryId, userId);
-
         if (existingCategory == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Categoria não encontrada.");
         }
@@ -85,14 +81,9 @@ public class CategoryController {
             return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Você não tem permissão para modificar esta categoria.");
         }
 
-        // Atualizar os campos da categoria
-        existingCategory.setTitle(categoryUpdate.getTitle());
-        existingCategory.setDescription(categoryUpdate.getDescription());
+        existingCategory.setTitle(categoryUpdateDTO.getTitle());
+        existingCategory.setDescription(categoryUpdateDTO.getDescription());
 
-        // Reatribuir as transações
-        existingCategory.setTransactions(existingCategory.getTransactions());
-
-        // Salvar a categoria atualizada
         categoryService.saveCategory(existingCategory);
 
         return ResponseEntity.ok(existingCategory);
@@ -102,8 +93,6 @@ public class CategoryController {
     @DeleteMapping("/categories/{categoryId}")
     public ResponseEntity<?> deleteCategory(HttpServletRequest request, @PathVariable("categoryId") Integer categoryId) {
         int userId = (Integer) request.getAttribute("userId");
-
-        // Recuperar a categoria existente do banco de dados
         Category existingCategory = categoryService.fetchCategoryById(categoryId, userId);
 
         if (existingCategory == null) {

@@ -2,7 +2,7 @@ package br.ufpb.dsc.expense_tracker_api.service;
 
 import java.util.List;
 
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
 import br.ufpb.dsc.expense_tracker_api.exception.EtBadRequestException;
 import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
 

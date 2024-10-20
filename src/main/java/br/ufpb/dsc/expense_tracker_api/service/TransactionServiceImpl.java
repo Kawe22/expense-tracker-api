@@ -1,16 +1,16 @@
 package br.ufpb.dsc.expense_tracker_api.service;
 
 import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import br.ufpb.dsc.expense_tracker_api.dao.TransactionRepository;
-import br.ufpb.dsc.expense_tracker_api.dao.CategoryRepository;
-import br.ufpb.dsc.expense_tracker_api.dao.UserRepository;
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
-import br.ufpb.dsc.expense_tracker_api.entity.Transaction;
-import br.ufpb.dsc.expense_tracker_api.entity.User;
+import br.ufpb.dsc.expense_tracker_api.repository.TransactionRepository;
+import br.ufpb.dsc.expense_tracker_api.repository.CategoryRepository;
+import br.ufpb.dsc.expense_tracker_api.repository.UserRepository;
+import br.ufpb.dsc.expense_tracker_api.dto.TransactionRequestDTO;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
+import br.ufpb.dsc.expense_tracker_api.model.Transaction;
+import br.ufpb.dsc.expense_tracker_api.model.User;
 import br.ufpb.dsc.expense_tracker_api.exception.EtBadRequestException;
 import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
 
@@ -46,24 +46,37 @@ public class TransactionServiceImpl implements TransactionService {
     }
 
     @Override
-    public Transaction saveTransaction(Transaction transaction, Integer categoryId, Integer userId)
+    public Transaction saveTransaction(TransactionRequestDTO transactionDTO, Integer categoryId, Integer userId)
             throws EtBadRequestException {
         try {
-            // Recupera a categoria e o usuário do banco de dados
             Category category = categoryRepository.findById(categoryId)
                     .orElseThrow(() -> new EtResourceNotFoundException("Category not found"));
             User user = userRepository.findById(userId)
                     .orElseThrow(() -> new EtResourceNotFoundException("User not found"));
 
-            // Vincula a categoria e o usuário à transação
+            Transaction transaction = new Transaction();
+            transaction.setAmount(transactionDTO.getAmount());
+            transaction.setNote(transactionDTO.getNote());
+            transaction.setTransactionDate(transactionDTO.getTransactionDate());
+            transaction.setRemind(transactionDTO.isRemind());
+
             transaction.setCategory(category);
             transaction.setUser(user);
 
-            // Salva a transação no banco de dados
             return transactionRepository.save(transaction);
         } catch (Exception e) {
             throw new EtBadRequestException("Invalid request", e);
         }
+    }
+
+    @Override
+    public Transaction updateTransaction(TransactionRequestDTO transactionDTO, Transaction existingTransaction) {
+        existingTransaction.setAmount(transactionDTO.getAmount());
+        existingTransaction.setNote(transactionDTO.getNote());
+        existingTransaction.setTransactionDate(transactionDTO.getTransactionDate());
+        existingTransaction.setRemind(transactionDTO.isRemind());
+
+        return transactionRepository.save(existingTransaction);
     }
 
     @Override

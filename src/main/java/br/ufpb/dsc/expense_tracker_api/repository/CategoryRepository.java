@@ -1,13 +1,10 @@
-package br.ufpb.dsc.expense_tracker_api.dao;
+package br.ufpb.dsc.expense_tracker_api.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.jpa.repository.Modifying;
-import org.springframework.data.jpa.repository.Query;
-import org.springframework.data.repository.query.Param;
 
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
 
 public interface CategoryRepository extends JpaRepository<Category, Integer> {
 

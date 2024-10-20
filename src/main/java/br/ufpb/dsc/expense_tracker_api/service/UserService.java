@@ -1,8 +1,6 @@
 package br.ufpb.dsc.expense_tracker_api.service;
 
-import java.util.List;
-
-import br.ufpb.dsc.expense_tracker_api.entity.User;
+import br.ufpb.dsc.expense_tracker_api.model.User;
 import br.ufpb.dsc.expense_tracker_api.exception.EtAuthException;
 
 public interface UserService {

@@ -1,13 +1,8 @@
-package br.ufpb.dsc.expense_tracker_api.entity;
+package br.ufpb.dsc.expense_tracker_api.model;
 
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-
+import javax.persistence.*;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Positive;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 @Entity
@@ -16,9 +11,16 @@ public class Transaction {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    @NotNull(message = "O valor não pode ser nulo")
+    @Positive(message = "O valor deve ser positivo")
     private Double amount;
+
     private String note;
+
+    @NotNull(message = "A data da transação é obrigatória")
     private Long transactionDate;
+
     private boolean remind;
 
     @JsonIgnore
@@ -29,8 +31,9 @@ public class Transaction {
     @JsonIgnore
     @JoinColumn()
     @ManyToOne(fetch = FetchType.LAZY)
-    private Category category;  // Aqui a correção
+    private Category category;
 
+    // Construtores
     public Transaction() {
     }
 
@@ -49,6 +52,7 @@ public class Transaction {
         this.remind = remind;
     }
 
+    // Getters e Setters
     public Integer getId() {
         return id;
     }
@@ -97,11 +101,11 @@ public class Transaction {
         this.user = user;
     }
 
-    public Category getCategory() {  // Aqui a correção
+    public Category getCategory() {
         return category;
     }
 
-    public void setCategory(Category category) {  // Aqui a correção
+    public void setCategory(Category category) {
         this.category = category;
     }
 }

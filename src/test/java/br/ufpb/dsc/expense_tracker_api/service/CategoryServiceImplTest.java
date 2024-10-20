@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
-import br.ufpb.dsc.expense_tracker_api.dao.CategoryRepository;
-import br.ufpb.dsc.expense_tracker_api.entity.Category;
+import br.ufpb.dsc.expense_tracker_api.repository.CategoryRepository;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.jupiter.api.BeforeEach;

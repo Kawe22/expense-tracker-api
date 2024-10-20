@@ -1,10 +1,10 @@
-package br.ufpb.dsc.expense_tracker_api.dao;
+package br.ufpb.dsc.expense_tracker_api.repository;
 
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
-import br.ufpb.dsc.expense_tracker_api.entity.Transaction;
+import br.ufpb.dsc.expense_tracker_api.model.Transaction;
 
 public interface TransactionRepository extends JpaRepository<Transaction, Integer> {
 
