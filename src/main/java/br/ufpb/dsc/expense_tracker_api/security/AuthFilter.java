@@ -11,7 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.filter.GenericFilterBean;
 
-import br.ufpb.dsc.expense_tracker_api.Constants;
+import br.ufpb.dsc.expense_tracker_api.config.Constants;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

@@ -1,6 +1,6 @@
 package br.ufpb.dsc.expense_tracker_api.controller;
 
-import br.ufpb.dsc.expense_tracker_api.Constants;
+import br.ufpb.dsc.expense_tracker_api.config.Constants;
 import br.ufpb.dsc.expense_tracker_api.dto.LoginRequestDTO;
 import br.ufpb.dsc.expense_tracker_api.dto.RegisterRequestDTO;
 import br.ufpb.dsc.expense_tracker_api.dto.UserUpdateRequestDTO;
@@ -12,7 +12,6 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

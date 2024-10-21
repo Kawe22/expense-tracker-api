@@ -1,4 +1,4 @@
-package br.ufpb.dsc.expense_tracker_api;
+package br.ufpb.dsc.expense_tracker_api.config;
 
 public class Constants {
 
