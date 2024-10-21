@@ -8,7 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
-import br.ufpb.dsc.expense_tracker_api.filter.AuthFilter; // Ajuste aqui
+import br.ufpb.dsc.expense_tracker_api.security.AuthFilter; // Ajuste aqui
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 @SpringBootApplication(exclude = SecurityAutoConfiguration.class)

@@ -21,21 +21,16 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public Category fetchCategoryById(Integer categoryId, Integer userId) throws EtResourceNotFoundException {
-        try {
-            return categoryRepository.findByIdAndUserId(categoryId, userId);
-        } catch (Exception e) {
-            throw new EtResourceNotFoundException("Resource not found");
-        }
+        return categoryRepository.findByIdAndUserId(categoryId, userId)
+                .orElseThrow(() -> new EtResourceNotFoundException("Resource not found"));
     }
 
     @Override
     public Category saveCategory(Category category) throws EtBadRequestException {
         try {
             if (category.getId() != null) {
-                Category existingCategory = categoryRepository.findByIdAndUserId(category.getId(), category.getUser().getId());
-                if (existingCategory == null) {
-                    throw new EtResourceNotFoundException("Category not found.");
-                }
+                Category existingCategory = categoryRepository.findByIdAndUserId(category.getId(), category.getUser().getId())
+                        .orElseThrow(() -> new EtResourceNotFoundException("Category not found."));
             }
 
             return categoryRepository.save(category);
@@ -46,11 +41,8 @@ public class CategoryServiceImpl implements CategoryService {
 
     @Override
     public void removeCategoryById(Integer categoryId, Integer userId) throws EtResourceNotFoundException {
-        try {
-            Category category = categoryRepository.findByIdAndUserId(categoryId, userId);
-            categoryRepository.delete(category);
-        } catch (Exception e) {
-            throw new EtResourceNotFoundException("Resource not found");
-        }
+        Category category = categoryRepository.findByIdAndUserId(categoryId, userId)
+                .orElseThrow(() -> new EtResourceNotFoundException("Resource not found"));
+        categoryRepository.delete(category);
     }
 }

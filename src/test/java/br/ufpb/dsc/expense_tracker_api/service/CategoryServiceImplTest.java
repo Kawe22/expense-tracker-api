@@ -1,77 +1,116 @@
 package br.ufpb.dsc.expense_tracker_api.service;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.junit.jupiter.api.Assertions.*;
 
-import br.ufpb.dsc.expense_tracker_api.repository.CategoryRepository;
-import br.ufpb.dsc.expense_tracker_api.model.Category;
-import java.util.ArrayList;
-import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
-@ExtendWith(MockitoExtension.class)
-class CategoryServiceImplTest {
+import br.ufpb.dsc.expense_tracker_api.exception.EtBadRequestException;
+import br.ufpb.dsc.expense_tracker_api.exception.EtResourceNotFoundException;
+import br.ufpb.dsc.expense_tracker_api.model.Category;
+import br.ufpb.dsc.expense_tracker_api.model.User;
+import br.ufpb.dsc.expense_tracker_api.repository.CategoryRepository;
 
-    @Mock
-    private CategoryRepository categoryRepository;
+import java.util.Optional;
+
+@ExtendWith(MockitoExtension.class)
+public class CategoryServiceImplTest {
 
     @InjectMocks
     private CategoryServiceImpl categoryService;
 
-    private List<Category> categories;
+    @Mock
+    private CategoryRepository categoryRepository;
+
+    private Category category;
 
     @BeforeEach
     void setUp() {
-        categories = new ArrayList<>();
-        categories.add(new Category(1, "Shopping", "Shopping", null));
-        categories.add(new Category(2, "Fees", "Education", null));
+        User user = new User();
+        user.setId(1);
+
+        category = new Category();
+        category.setId(1);
+        category.setTitle("Food");
+        category.setDescription("All food-related expenses");
+        category.setUser(user);
     }
 
-    @DisplayName("JUnit test for fetchCategoriesOfUser method")
     @Test
-    void fetchCategoriesOfUser() {
-        when(categoryRepository.findByUserId(1)).thenReturn(categories);
-        assertEquals(2, categoryService.fetchCategoriesOfUser(1).size());
-        assertEquals("Shopping", categoryService.fetchCategoriesOfUser(1).get(0).getTitle());
+    public void testGetCategoryById() {
+        // Simulando o retorno de um Optional<Category>
+        when(categoryRepository.findByIdAndUserId(1, 1)).thenReturn(Optional.of(category));
+
+        Category fetchedCategory = categoryService.fetchCategoryById(1, 1);
+
+        assertNotNull(fetchedCategory);
+        assertEquals("Food", fetchedCategory.getTitle());
     }
 
-    @DisplayName("JUnit test for fetchCategoryById method")
     @Test
-    void fetchCategoryById() {
-        when(categoryRepository.findByIdAndUserId(1, 1))
-                .thenReturn(categories.get(0))
-                .thenReturn(categories.get(1));
-        assertEquals(1, categoryService.fetchCategoryById(1, 1).getId());
-        assertNotEquals(1, categoryService.fetchCategoryById(1, 1).getId());
+    public void testDeleteCategory() {
+        // Simulando o retorno de um Optional<Category>
+        when(categoryRepository.findByIdAndUserId(1, 1)).thenReturn(Optional.of(category));
+
+        categoryService.removeCategoryById(1, 1);
+
+        verify(categoryRepository, times(1)).delete(category);
     }
 
-    @DisplayName("JUnit test for saveCategory method")
     @Test
-    void saveCategory() {
-        when(categoryRepository.save(categories.get(0)))
-                .thenReturn(categories.get(0))
-                .thenReturn(null);
-        assertNotNull(categoryService.saveCategory(categories.get(0)));
-        assertNull(categoryService.saveCategory(null));
+    public void testCategoryNotFoundException() {
+        // Simulando que a categoria não foi encontrada
+        when(categoryRepository.findByIdAndUserId(1, 1)).thenReturn(Optional.empty());
+
+        assertThrows(EtResourceNotFoundException.class, () -> {
+            categoryService.fetchCategoryById(1, 1);
+        });
     }
 
-    @DisplayName("JUnit test for removeCategoryById method")
     @Test
-    @Disabled
-    void removeCategoryById() {
-//    when(categoryRepository.delete(categories.get(0))).thenThrow(EtResourceNotFoundException.class);
-//    assertThrows(EtResourceNotFoundException.class, () -> categoryService.removeCategoryById(1, 1));
-        assertTrue(true);
+    public void testCreateCategory() {
+        // Simulando a criação de uma nova categoria (sem ID)
+        category.setId(null);  // Definindo o ID como nulo para simular uma nova categoria
+        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+
+        Category createdCategory = categoryService.saveCategory(category);
+
+        assertNotNull(createdCategory);
+        assertEquals("Food", createdCategory.getTitle());
+        verify(categoryRepository, times(1)).save(any(Category.class));
+    }
+
+    @Test
+    public void testBadRequestException() {
+        // Simulando uma tentativa de salvar uma categoria com título inválido
+        category.setTitle("");  // Título vazio deve gerar exceção
+
+        assertThrows(EtBadRequestException.class, () -> {
+            categoryService.saveCategory(category);
+        });
+
+        verify(categoryRepository, times(0)).save(any(Category.class));
+    }
+
+    @Test
+    public void testUpdateCategory() {
+        // Simulando a atualização de uma categoria existente
+        when(categoryRepository.findByIdAndUserId(1, 1)).thenReturn(Optional.of(category));
+        when(categoryRepository.save(any(Category.class))).thenReturn(category);
+
+        category.setTitle("Updated Title");
+        Category updatedCategory = categoryService.saveCategory(category);
+
+        assertNotNull(updatedCategory);
+        assertEquals("Updated Title", updatedCategory.getTitle());
+        verify(categoryRepository, times(1)).save(any(Category.class));
     }
 }

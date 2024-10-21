@@ -1,6 +1,7 @@
 package br.ufpb.dsc.expense_tracker_api.repository;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -10,6 +11,7 @@ public interface CategoryRepository extends JpaRepository<Category, Integer> {
 
     public List<Category> findByUserId(Integer id);
 
-    public Category findByIdAndUserId(Integer categoryId, Integer userId);
+    // Alterar o retorno para Optional<Category>
+    public Optional<Category> findByIdAndUserId(Integer categoryId, Integer userId);
 
 }
